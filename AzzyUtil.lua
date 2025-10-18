@@ -1653,6 +1653,7 @@ function GetSAtkSkill(myid)
 				end
 			elseif htype==ELEANOR and UseEleanorSonicClaw==1 and EleanorMode == 0 then
 				skill=MH_SONIC_CRAW
+				EleanorLastComboSkill=skill
 				if EleanorSonicClawLevel==nil then
 					level=5
 				else
@@ -1660,6 +1661,7 @@ function GetSAtkSkill(myid)
 				end
 			elseif htype==ELEANOR and UseEleanorTinderBreaker==1 and EleanorMode == 1 then
 				skill=MH_TINDER_BREAKER
+				EleanorLastComboSkill=skill
 				if EleanorTinderBreakerLevel==nil then
 					level=5
 				else
@@ -1714,7 +1716,8 @@ function GetComboSkill(myid)
 					else
 						level=EleanorMidnightLevel
 					end
-
+				else
+					EleanorLastComboSkill=0
 				end
 			end
 			--if EleanorMode==0 or EleanorDoNotSwitchMode==1 then
@@ -1782,10 +1785,8 @@ function GetGrappleSkill(myid)
 					else
 						level=EleanorTinderBreakerLevel
 					end
-				elseif EleanorDoNotSwitchMode==0 and EleanorChangeInstances==1 then
-					--EleanorLastComboSkill = 0
-					--EleanorForceChange = 1
-					DoSkill(MH_STYLE_CHANGE,1,MyID,8)		
+				else
+					EleanorLastComboSkill=0	
 				end
 				--if EleanorLastComboSkill == MH_TINDER_BREAKER then
 				--	skill=MH_CBC
@@ -2314,12 +2315,18 @@ end
 function GetTargetedSkills(myid)
 	s,l=GetAtkSkill(myid)
 	Mainatk={MAIN_ATK,s,l}
-	s,l=GetSAtkSkill(myid)
-	Satk={S_ATK,s,l}
-	s,l=GetComboSkill(myid)
-	ComboAtk={COMBO_ATK,s,l}
-	s,l=GetGrappleSkill(myid)
-	GrappleAtk={GRAPPLE_ATK,s,l}
+	if htype~=ELEANOR or (htype==ELEANOR and (EleanorLastComboSkill == 0 or AutoComboMode == 0)) then
+		s,l=GetSAtkSkill(myid)
+		Satk={S_ATK,s,l}
+	elseif htype==ELEANOR and AutoComboMode ~= 0 and EleanorLastComboSkill ~= 0 then
+		if EleanorMode == 0 then
+			s,l=GetComboSkill(myid)
+			ComboAtk={COMBO_ATK,s,l}
+		else
+			s,l=GetGrappleSkill(myid)
+			GrappleAtk={GRAPPLE_ATK,s,l}
+		end
+	end
 	s,l=GetMobSkill(myid)
 	Mobatk={MOB_ATK,s,l}
 	s,l=GetDebuffSkill(myid)
