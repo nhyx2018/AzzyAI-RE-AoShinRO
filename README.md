@@ -1,3 +1,5 @@
+## [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/AoShinRO/AzzyAI-RE)
+
 Azzy AI modified to work in private server with some logic updates
 tested in clients
 |------|
