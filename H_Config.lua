@@ -139,3 +139,9 @@ DoNotAttackMoving        = 0
 UseDieterVolcanicAsh     = 1
 UseSmartBulwark          = 1
 DieterPyroclasticLevel   = 0
+
+--Eleanor New Skills
+EleanorUseBlazingFurious        = 1
+EleanorBlazingFuriousLevel      = 10
+EleanorUseFighterRises          = 1
+EleanorFighterRisesLevel        = 10

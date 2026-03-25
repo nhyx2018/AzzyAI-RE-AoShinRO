@@ -1630,6 +1630,12 @@ function GetSAtkSkill(myid)
 	if (IsHomun(myid)==1) then
 		htype=GetV(V_HOMUNTYPE,myid)
 		if htype > 47 then -- it's a Homun S
+			if htype == ELEANOR then
+				if ComboMFTimeout > GetTick() and ComboCBCTimeout < GetTick() and EleanorDoNotSwitchMode==0 then
+					DoSkill(MH_STYLE_CHANGE,1,MyID,8)
+					EleanorMode = EleanorMode == 0 and 1 or 0
+				end
+			end
 			if htype==EIRA and UseEiraEraseCutter==1 then
 				skill=MH_ERASER_CUTTER
 				if EiraEraseCutterLevel==nil then
@@ -1651,43 +1657,39 @@ function GetSAtkSkill(myid)
 				else
 					level=SeraParalyzeLevel
 				end
-			elseif htype==ELEANOR and UseEleanorSonicClaw==1 and EleanorMode == 0 then
+			elseif htype==ELEANOR and UseEleanorSonicClaw==1 and EleanorMode == 0 and MySpheres > AutoComboSpheres and ComboSCTimeout < GetTick() then
 				skill=MH_SONIC_CRAW
-				EleanorLastComboSkill=skill
 				if EleanorSonicClawLevel==nil then
 					level=5
 				else
 					level=EleanorSonicClawLevel
 				end
-			elseif htype==ELEANOR and UseEleanorTinderBreaker==1 and EleanorMode == 1 then
+			elseif htype==ELEANOR and UseEleanorTinderBreaker==1 and EleanorMode == 1 and MySpheres > AutoComboSpheres and ComboTBTimeout < GetTick() then
 				skill=MH_TINDER_BREAKER
-				EleanorLastComboSkill=skill
 				if EleanorTinderBreakerLevel==nil then
-					level=5
+					level=10
 				else
 					level=EleanorTinderBreakerLevel
+				end			
+			elseif htype == ELEANOR and EleanorUseFighterRises ==1 and MySpheres < AutoComboSpheres and GetV(V_SP,MyID)-MyLastSP > 1000 then
+				MySpheres = 5
+				skill=MH_THE_ONE_FIGHTER_RISES
+				if EleanorFighterRisesLevel==nil then
+					level=10
+				else
+					level=EleanorFighterRisesLevel
 				end
-				--if ((EleanorLastComboSkill == MH_EQC and UseEleanorSonicClaw==1) or MySpheres < AutoComboSpheres) and EleanorDoNotSwitchMode==0 and EleanorChangeInstances==1 then
-				--	EleanorLastComboSkill = 0
-				--	EleanorForceChange = 1
-				--	DoSkill(MH_STYLE_CHANGE,1,MyID,8)
-				--	skill,level = 0,0
-				--end
-				--if (EleanorLastComboSkill == skill or EleanorLastComboSkill == MH_CBC) then
-				--	skill,level = GetGrappleSkill(myid)
-				--end
-				--if (EleanorMode == 0 or (EleanorLastComboSkill == MH_EQC and UseEleanorSonicClaw==1)) and EleanorDoNotSwitchMode==0 then
-				--	DoSkill(MH_STYLE_CHANGE,1,MyID,8)
-				--if MySpheres < AutoComboSpheres and EleanorDoNotSwitchMode==0 and EleanorChangeInstances==1 then
-				--	DoSkill(MH_STYLE_CHANGE,1,MyID,8)
-				--end
+			elseif htype == ELEANOR and EleanorUseBlazingFurious ==1 then --TODO
+				skill=MH_BLAZING_AND_FURIOUS
+				if EleanorBlazingFuriousLevel==nil then
+					level=10
+				else
+					level=EleanorBlazingFuriousLevel
+				end									
 			end
 		end
-		if level ~=0 then
-			return skill,level
-		end
 	end
-	return 0,0
+	return skill,level
 end
 
 function GetComboSkill(myid)
@@ -1696,56 +1698,26 @@ function GetComboSkill(myid)
 	if (IsHomun(myid)==1) then
 		htype=GetV(V_HOMUNTYPE,myid)
 		if htype==ELEANOR then
-			if EleanorMode==0 or EleanorDoNotSwitchMode==1 and MySpheres > AutoComboSpheres then
-				--if EleanorLastComboSkill == MH_MIDNIGHT_FRENZY and UseEleanorTinderBreaker==1 and EleanorDoNotSwitchMode==0 and EleanorChangeInstances==1 then
-				--	EleanorLastComboSkill = 0
-				--	EleanorForceChange = 1
-				--	DoSkill(MH_STYLE_CHANGE,1,MyID,8)
-				--	skill,level = 0,0				
-				if ComboSCTimeout > GetTick() and EleanorLastComboSkill == MH_SONIC_CRAW then
+			if EleanorMode==0 or EleanorDoNotSwitchMode==1 and MySpheres > AutoComboSpheres then			
+				if ComboSCTimeout > GetTick() and ComboSVTimeout < GetTick() then
 					skill=MH_SILVERVEIN_RUSH
 					if EleanorSilverveinLevel==nil then
 						level=10
 					else
 						level=EleanorSilverveinLevel
 					end
-				elseif ComboSVTimeout > GetTick() and EleanorLastComboSkill == MH_SILVERVEIN_RUSH then
+				elseif ComboSVTimeout > GetTick() and ComboMFTimeout < GetTick() then
 					skill=MH_MIDNIGHT_FRENZY
 					if EleanorMidnightLevel==nil then
 						level=10
 					else
 						level=EleanorMidnightLevel
 					end
-				else
-					EleanorLastComboSkill=0
 				end
 			end
-			--if EleanorMode==0 or EleanorDoNotSwitchMode==1 then
-			--	if EleanorLastComboSkill == MH_SONIC_CRAW then
-			--		skill=MH_SILVERVEIN_RUSH
-			--		if EleanorSilverveinLevel==nil then
-			--			level=SkillList[htype][skill]
-			--		else
-			--			level=EleanorSilverveinLevel
-			--		end
-			--	elseif EleanorLastComboSkill == MH_SILVERVEIN_RUSH then
-			--		skill=MH_MIDNIGHT_FRENZY
-			--		if EleanorMidnightLevel==nil then
-			--			level=SkillList[htype][skill]
-			--		else
-			--			level=EleanorMidnightLevel
-			--		end
-			--	elseif EleanorLastComboSkill == MH_MIDNIGHT_FRENZY and UseEleanorTinderBreaker==1 and EleanorDoNotSwitchMode==0 and EleanorChangeInstances==1 then
-			--		EleanorLastComboSkill = 0
-			--		DoSkill(MH_STYLE_CHANGE,1,MyID,8)
-			--	end
-			--end
-		end
-		if level ~=0 then
-			return skill,level
 		end
 	end
-	return 0,0
+	return skill,level
 end
 
 function GetGrappleSkill(myid)
@@ -1755,68 +1727,25 @@ function GetGrappleSkill(myid)
 		htype=GetV(V_HOMUNTYPE,myid)
 		if htype==ELEANOR and MySpheres > AutoComboSpheres then
 			if EleanorMode==1 or EleanorDoNotSwitchMode==1 then
-				--if ((EleanorLastComboSkill == MH_EQC and UseEleanorSonicClaw==1) or MySpheres < AutoComboSpheres) and EleanorDoNotSwitchMode==0 and EleanorChangeInstances==1 then
-				--	EleanorLastComboSkill = 0
-				--	EleanorForceChange = 1
-				--	DoSkill(MH_STYLE_CHANGE,1,MyID,8)
-				--	skill,level = 0,0
-				if ComboSVTimeout > GetTick() and EleanorLastComboSkill == MH_TINDER_BREAKER then
-					if MySpheres > AutoComboSpheres then
+				if ComboTBTimeout > GetTick() then
 						skill=MH_CBC
 						if EleanorCBCLevel==nil then
 							level=5
 						else
 							level=EleanorCBCLevel
 						end
-					end
-				elseif ComboSCTimeout > GetTick() and EleanorLastComboSkill == MH_CBC then
-					if MySpheres > AutoComboSpheres then
+				elseif ComboCBCTimeout > GetTick() then
 						skill=MH_EQC
 						if EleanorEQCLevel==nil then
 							level=5
 						else
 							level=EleanorEQCLevel
 						end
-					end
-				elseif MySpheres > AutoComboSpheres then
-					skill=MH_TINDER_BREAKER
-					if EleanorTinderBreakerLevel==nil then
-						level=5
-					else
-						level=EleanorTinderBreakerLevel
-					end
-				else
-					EleanorLastComboSkill=0	
 				end
-				--if EleanorLastComboSkill == MH_TINDER_BREAKER then
-				--	skill=MH_CBC
-				--	if EleanorCBCLevel==nil then
-				--		level=10
-				--	else
-				--		level=EleanorCBCLevel
-				--	end
-				--elseif EleanorLastComboSkill == MH_CBC then
-				--	skill=MH_EQC
-				--	if EleanorEQCLevel==nil then
-				--		level=10
-				--	else
-				--		level=EleanorEQCLevel
-				--	end
-				--else
-				--	skill=MH_TINDER_BREAKER
-				--	if EleanorTinderBreakerLevel==nil then
-				--		level=5
-				--	else
-				--		level=EleanorTinderBreakerLevel
-				--	end				
-				--end
 			end
 		end
-		if level ~=0 then
-			return skill,level
-		end
 	end
-	return 0,0
+	return skill,level
 end
 
 function GetAtkSkill(myid)
@@ -1964,7 +1893,7 @@ function GetMobSkill(myid)
 			if htype==EIRA and UseEiraXenoSlasher==1 then
 				skill=MH_XENO_SLASHER
 				if EiraXenoSlasherLevel==nil then
-					level=4
+					level=10
 				else
 					level=EiraXenoSlasherLevel
 				end
@@ -2315,18 +2244,12 @@ end
 function GetTargetedSkills(myid)
 	s,l=GetAtkSkill(myid)
 	Mainatk={MAIN_ATK,s,l}
-	if htype~=ELEANOR or (htype==ELEANOR and (EleanorLastComboSkill == 0 or AutoComboMode == 0)) then
-		s,l=GetSAtkSkill(myid)
-		Satk={S_ATK,s,l}
-	elseif htype==ELEANOR and AutoComboMode ~= 0 and EleanorLastComboSkill ~= 0 then
-		if EleanorMode == 0 then
-			s,l=GetComboSkill(myid)
-			ComboAtk={COMBO_ATK,s,l}
-		else
-			s,l=GetGrappleSkill(myid)
-			GrappleAtk={GRAPPLE_ATK,s,l}
-		end
-	end
+	s,l=GetSAtkSkill(myid)
+	Satk={S_ATK,s,l}
+	s,l=GetComboSkill(myid)
+	ComboAtk={COMBO_ATK,s,l}
+	s,l=GetGrappleSkill(myid)
+	GrappleAtk={GRAPPLE_ATK,s,l}
 	s,l=GetMobSkill(myid)
 	Mobatk={MOB_ATK,s,l}
 	s,l=GetDebuffSkill(myid)
@@ -2438,34 +2361,22 @@ function DoSkill(skill, level, target, mode, targx, targy)
 
     if skill == MH_SONIC_CRAW then
         ComboSCTimeout = GetTick() + 2000
-        ComboSVTimeout = 0
         MySpheres = MySpheres - 1
-	EleanorLastComboSkill = skill
     elseif skill == MH_SILVERVEIN_RUSH then
         ComboSVTimeout = GetTick() + 2000
-        ComboSCTimeout = 0
         MySpheres = MySpheres - 1
-	EleanorLastComboSkill = skill
     elseif skill == MH_MIDNIGHT_FRENZY then
         MySpheres = MySpheres - 2
-        ComboSVTimeout = 0
-        ComboSCTimeout = 0
-	EleanorLastComboSkill = skill
+        ComboMFTimeout = GetTick() + 2000
     elseif skill == MH_TINDER_BREAKER then
         MySpheres = MySpheres - 1
-        ComboSCTimeout = 0
-        ComboSVTimeout = GetTick() + 2000
-	EleanorLastComboSkill = skill
+        ComboTBTimeout = GetTick() + 2000
     elseif skill == MH_EQC then
-        ComboSVTimeout = 0
-        ComboSCTimeout = GetTick() + 2000
+        ComboEQCTimeout = GetTick() + 2000	
         MySpheres = MySpheres - 2
-	EleanorLastComboSkill = skill
     elseif skill == MH_CBC then
-        ComboSCTimeout = 0
-        ComboSVTimeout = 0
+        ComboCBCTimeout = GetTick() + 2000		
         MySpheres = MySpheres - 2
-	EleanorLastComboSkill = skill
     end
 
     if skill == HFLI_SBR44 and AllowSBR44 ~= 1 then

@@ -13,7 +13,7 @@ function	GetMsg (id) end
 function	GetResMsg (id) end
 function	SkillObject (id,level,skill,target) end
 function	SkillGround (id,level,skill,x,y) end
-function	IsMonster (id) end								-- id´Â ¸ó½ºÅÍÀÎ°¡? yes -> 1 no -> 0
+function	IsMonster (id) end								-- idï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Î°ï¿½? yes -> 1 no -> 0
 
 --]]
 --GetV() first argument--
@@ -496,9 +496,10 @@ MyBuffSPCosts			= {}
 MyBuffSPCost			= 0		
 ComboSCTimeout=0
 ComboSVTimeout=0
-EleanorLastComboSkill=0
-EleanorChangeInstances=1
-EleanorForceChange = 0
+ComboTBTimeout=0
+ComboMFTimeout=0
+ComboEQCTimeout=0
+ComboCBCTimeout=0
 
 modtwROMoveDid =0
 modtwROAttackDid=0
